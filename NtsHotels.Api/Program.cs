@@ -1,6 +1,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using NtsHotels.Api.Data;
@@ -14,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddSingleton<HotelImageProcessor>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -71,6 +74,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var applied = await db.Database.GetAppliedMigrationsAsync();
+    if (!applied.Contains("20261109175417_RemoveHotelImageUrl"))
+    {
+        await db.GetService<IMigrator>().MigrateAsync("20261109174124_AddHotelImageData");
+        await LegacyHotelImageImporter.ImportAsync(db, scope.ServiceProvider.GetRequiredService<HotelImageProcessor>());
+    }
     await db.Database.MigrateAsync();
     await DbInitializer.SeedAsync(db);
 }

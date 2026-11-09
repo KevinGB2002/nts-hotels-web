@@ -18,7 +18,6 @@ public class HotelUpdateDto
     [Range(1, 5)]
     public int Rating { get; set; }
 
-    public string? ImageUrl { get; set; }
 
     public bool IsActive { get; set; } = true;
 }

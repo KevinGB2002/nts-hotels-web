@@ -11,13 +11,7 @@ API REST para la gestión de hoteles y usuarios de la cadena NTS Hotels. Está c
 - **Autorización por roles:** la creación, edición y eliminación de hoteles, y todos los endpoints de usuarios, requieren el rol `Admin`.
 - **Swagger:** la interfaz OpenAPI se habilita en el entorno `Development`.
 
-Credenciales iniciales del administrador en una base nueva:
-
-| Usuario | Contraseña |
-| --- | --- |
-| `admin@ntshotels.com` | `Admin123*` |
-
-Estas credenciales son solo para desarrollo y pruebas. Cámbialas antes de exponer la API en cualquier entorno compartido o productivo. El seed no reemplaza un usuario administrador ya existente; los hoteles tampoco se vuelven a insertar si la tabla ya contiene registros.
+En una base nueva, define la variable de entorno `NTSHOTELS_ADMIN_PASSWORD` con una contraseña segura antes de iniciar la API. El administrador inicial usa el correo `admin@ntshotels.com`. El seed no reemplaza un usuario administrador ya existente; los hoteles tampoco se vuelven a insertar si la tabla ya contiene registros. No compartas la contraseña ni la guardes en el repositorio.
 
 ## Arquitectura y estructura
 
@@ -85,9 +79,10 @@ Debe aparecer una versión `8.0.x`.
 
 3. Restaura dependencias y arranca la API desde el directorio del proyecto:
 
-   ```bash
+   ```powershell
+   $env:NTSHOTELS_ADMIN_PASSWORD = '<contraseña-segura>'
    dotnet restore
-   dotnet run --launch-profile http
+   dotnet run --launch-profile https
    ```
 
    También puedes usar `dotnet run` para iniciar con el perfil predeterminado. La base `nts_hotels.db` se crea en el directorio de ejecución si todavía no existe; las migraciones y el seed se ejecutan automáticamente al arrancar.
@@ -99,7 +94,7 @@ El perfil HTTP está configurado en `http://localhost:5147`. El perfil HTTPS est
 En `Development`, abre Swagger UI en:
 
 ```text
-http://localhost:5147/swagger
+https://localhost:7102/swagger
 ```
 
 Usa **Try it out** para enviar solicitudes. Para probar rutas protegidas, primero ejecuta `POST /api/auth/login` con las credenciales de desarrollo. Copia el valor `token` de la respuesta, pulsa **Authorize** en Swagger y pega solo el token JWT. Después podrás llamar a las operaciones de administrador.
@@ -115,7 +110,7 @@ Ejemplo de solicitud:
 ```json
 {
   "email": "admin@ntshotels.com",
-  "password": "Admin123*"
+  "password": "<contraseña-configurada>"
 }
 ```
 
@@ -127,9 +122,16 @@ Ejemplo de solicitud:
 | `GET` | `/api/hotels/{id}` | Público | Obtiene un hotel por su GUID. |
 | `POST` | `/api/hotels` | `Admin` | Crea un hotel. |
 | `PUT` | `/api/hotels/{id}` | `Admin` | Actualiza un hotel existente. |
-| `DELETE` | `/api/hotels/{id}` | `Admin` | Elimina un hotel. |
+| `DELETE` | `/api/hotels/{id}` | `Admin` | Desactiva un hotel. |
+| `POST` | `/api/hotels/upload` | `Admin` | Crea un hotel con imagen en `multipart/form-data`. |
+| `PUT` | `/api/hotels/{id}/upload` | `Admin` | Actualiza un hotel y reemplaza su imagen con `multipart/form-data`. |
+| `GET` | `/api/hotels/{id}/image` | Público | Devuelve la imagen almacenada como JPEG. |
 
-Los campos principales para crear o actualizar un hotel son `name`, `description`, `address`, `city`, `rating` e `imageUrl`. La calificación debe estar entre 1 y 5. La actualización también acepta `isActive`.
+Los campos principales para crear o actualizar un hotel son `name`, `description`, `address`, `city` y `rating`. La calificación debe estar entre 1 y 5. La actualización también acepta `isActive`.
+
+Los endpoints con `/upload` reciben los mismos campos y un archivo obligatorio `image`. Se aceptan JPEG, PNG y WebP de hasta 10 MB y 25 megapíxeles. La API usa Magick.NET para orientar y reducir la imagen a un máximo de 800 píxeles de ancho y la guarda en SQLite como JPEG con calidad 80. `hasStoredImage` indica si hay una imagen guardada. Al actualizar sin enviar archivo se conserva la imagen anterior; los hoteles sin imagen muestran la imagen de respaldo en el cliente.
+
+Al actualizar una base existente, realiza una copia de seguridad antes de arrancar la nueva API. Antes de eliminar la columna antigua, la aplicación descarga y convierte las imágenes que todavía no estén almacenadas. La importación admite imágenes de hasta 10 MB y 50 megapíxeles desde direcciones HTTPS públicas. Si una descarga o conversión falla, el arranque se detiene y se conservan los enlaces originales; corrige el dato antes de volver a arrancar. La migración incluye una protección para impedir que se elimine la columna si quedan imágenes sin convertir.
 
 Ejemplo de creación:
 
@@ -139,8 +141,7 @@ Ejemplo de creación:
   "description": "Hotel de prueba",
   "address": "Calle 10 # 20-30",
   "city": "Bogotá",
-  "rating": 4,
-  "imageUrl": "https://example.com/hotel.jpg"
+  "rating": 4
 }
 ```
 
@@ -155,8 +156,8 @@ Todas las rutas de usuarios requieren un token JWT con rol `Admin`.
 | `GET` | `/api/users` | `Admin` | Lista usuarios. |
 | `GET` | `/api/users/{id}` | `Admin` | Obtiene un usuario por su GUID. |
 | `POST` | `/api/users` | `Admin` | Crea un usuario. |
-| `PUT` | `/api/users/{id}` | `Admin` | Actualiza nombre, correo, rol y estado. |
-| `DELETE` | `/api/users/{id}` | `Admin` | Elimina un usuario. |
+| `PUT` | `/api/users/{id}` | `Admin` | Actualiza nombre, correo, rol y estado; acepta una contraseña opcional de al menos 6 caracteres. |
+| `DELETE` | `/api/users/{id}` | `Admin` | Desactiva un usuario. |
 
 Para crear un usuario se envían `fullName`, `email`, `password` y `roleId`. La contraseña debe tener al menos seis caracteres e incluir una mayúscula, un número y un carácter especial. Los roles iniciales son `Admin` (`roleId: 1`) y `User` (`roleId: 2`).
 

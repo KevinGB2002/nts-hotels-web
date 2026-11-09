@@ -1,167 +1,93 @@
-# NTS Hotels - Sistema de Gestion Hotelera (Fullstack)
+# NTS Hotels
 
-Este repositorio contiene la solucion Fullstack completa para la cadena NTS Hotels, compuesta por una API REST en .NET 8 con SQLite y un cliente web interactivo desarrollado en Angular 17+ (con componentes standalone).
+Aplicación de gestión hotelera con una API REST en ASP.NET Core y un cliente web Angular. Los visitantes consultan hoteles y los administradores gestionan hoteles y usuarios.
 
-El proyecto permite a cualquier visitante consultar el catalogo general de hoteles con filtros dinamicos, mientras que ofrece un portal seguro de gestion para usuarios administradores.
-
-\---
-
-## Arquitectura General del Monorepo
+## Arquitectura
 
 ```text
 NtsHotels-Project/
-├── NtsHotels.Api/          # Backend: API REST en .NET 8, EF Core, SQLite y JWT
-│   └── Dockerfile          # Contenedor multi-etapa .NET 8 SDK / ASP.NET
-└── nts-hotels-client/      # Frontend: SPA en Angular 17+ con Standalone Components
-    ├── Dockerfile          # Contenedor multi-etapa Node.js / Nginx
-    └── nginx.conf          # Configuracion de Nginx para enrutamiento SPA
+├── NtsHotels.Api/           # .NET 8, Entity Framework Core, SQLite y JWT
+│   ├── Controllers/         # Rutas HTTP
+│   ├── DTOs/                # Contratos de entrada y salida
+│   ├── Data/                # Contexto, datos iniciales e importación histórica
+│   ├── Migrations/          # Migraciones de SQLite
+│   ├── Models/              # Entidades
+│   └── Services/            # Lógica de negocio y tratamiento de imágenes
+└── nts-hotels-client/       # Angular 22, componentes standalone
+    └── src/app/             # Páginas, servicios, guards e interceptor
 ```
 
-\---
+Consulta las guías de [la API](NtsHotels.Api/README.md) y [el cliente](nts-hotels-client/README.md) para más detalles.
 
-## Inicio Rapido en Local
+## Requisitos
 
-### Prerrequisitos
+- SDK de .NET 8.
+- Node.js compatible con Angular 22: `^22.22.3`, `^24.15.0` o `>=26.0.0`, y npm.
+- SQLite se utiliza a través del proveedor de Entity Framework Core; no requiere un servidor independiente.
+- Docker es opcional; cada proyecto dispone de un Dockerfile.
 
-* .NET 8 SDK
-* Node.js (version LTS) y npm
-* Angular CLI (`npm install -g @angular/cli`)
-* Docker Desktop (Opcional, para ejecucion mediante contenedores)
+## Ejecución local
 
-\---
+En una terminal, desde la raíz:
 
-### 1\. Configuracion y Ejecucion del Backend (NtsHotels.Api)
-
-1. Entra a la carpeta del backend:
-
-```bash
-   cd NtsHotels.Api
-   ```
-
-2. Revisa el archivo `appsettings.json` para verificar la cadena de conexion a SQLite, la clave JWT y los origenes permitidos para CORS:
-
-```json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Data Source=nts\_hotels.db"
-     },
-     "Cors": {
-       "AllowedOrigins": \[ "http://localhost:4200" ]
-     },
-     "Jwt": {
-       "Issuer": "NtsHotels.Api",
-       "Audience": "NtsHotels.Client",
-       "Key": "NtsHotels\_SecureSecretKey\_2026\_x9#mK9$vL2pQ8wZ1tY7bF4dX6sC3hJ",
-       "ExpirationMinutes": 60
-     }
-   }
-   ```
-
-3. Inicia la aplicacion (la base de datos `nts\_hotels.db` se creara y ejecutara el seed de datos automaticamente):
-
-```bash
-   dotnet run --launch-profile http
-   ```
-
-   * API: `http://localhost:5147`
-   * Swagger UI: `http://localhost:5147/swagger`
-
-\---
-
-### 2\. Configuracion y Ejecucion del Frontend (nts-hotels-client)
-
-1. Abre otra terminal y entra a la carpeta del frontend:
-
-```bash
-   cd nts-hotels-client
-   ```
-
-2. Instala las dependencias:
-
-```bash
-   npm install
-   ```
-
-3. Asegurate de que la URL de la API apunte al backend en `src/environments/environment.development.ts`:
-
-```typescript
-   export const environment = {
-     production: false,
-     apiUrl: 'http://localhost:5147'
-   };
-   ```
-
-4. Levanta el servidor de desarrollo:
-
-```bash
-   ng serve
-   ```
-
-   * Aplicacion Web: `http://localhost:4200/`
-
-\---
-
-## Despliegue con Docker y Servidor de Produccion
-
-El proyecto incluye configuraciones de Dockerfile optimizadas mediante construcciones multi-etapa (multi-stage builds) para empaquetar y desplegar tanto la API como el cliente en cualquier entorno o servicio en la nube (como Render, Fly.io, AWS o GCP).
-
-### Backend (.NET API) - `NtsHotels.Api/Dockerfile`
-
-Compila el proyecto utilizando el SDK de .NET 8 y genera una imagen ligera optimizada sobre el runtime de ASP.NET Core, exponiendo la aplicacion en el puerto `8080`.
-
-Comando para compilar y ejecutar manualmente:
-
-```bash
+```powershell
 cd NtsHotels.Api
-docker build -t nts-hotels-api .
-docker run -d -p 8080:8080 --name api-container nts-hotels-api
+$env:NTSHOTELS_ADMIN_PASSWORD = '<contraseña-segura>'
+dotnet restore
+dotnet run --launch-profile https
 ```
 
-### Frontend (Angular Client) - `nts-hotels-client/Dockerfile`
+La API escucha en `https://localhost:7102` y `http://localhost:5147`. Swagger está disponible en `https://localhost:7102/swagger` durante el desarrollo. Si es necesario, confía en el certificado local con `dotnet dev-certs https --trust`.
 
-Usa una primera etapa con `node:20-alpine` para compilar la aplicacion en modo produccion (`ng build`), y una segunda etapa basada en `nginx:alpine` para servir los activos estaticos en el puerto `80`. Incluye un archivo `nginx.conf` adaptado para redirigir las peticiones al `index.html` sin romper el enrutamiento interno de Angular.
+En otra terminal, desde la raíz:
 
-Comando para compilar y ejecutar manualmente:
-
-```bash
+```powershell
 cd nts-hotels-client
-docker build -t nts-hotels-client .
-docker run -d -p 80:80 --name client-container nts-hotels-client
+npm ci
+npm start
 ```
 
-\---
+Abre `http://localhost:4200`. El cliente de desarrollo apunta a `https://localhost:7102`; ajusta los entornos de Angular y los orígenes CORS de la API si utilizas otras direcciones. La URL configurada en el cliente de producción también debe corresponder al servidor real: `localhost` se refiere al dispositivo del visitante.
 
-## Credenciales de Prueba (Administrador)
+La API aplica migraciones y datos iniciales al arrancar. En una base nueva crea el administrador `admin@ntshotels.com` con la contraseña suministrada mediante `NTSHOTELS_ADMIN_PASSWORD`; esta variable no es necesaria si ya existe un administrador. Configura también la clave JWT mediante variables de entorno o un gestor de secretos; no uses claves ni credenciales de desarrollo en entornos compartidos o productivos.
 
-Al ejecutar el proyecto por primera vez, la inicializacion automatica de la base de datos (DbInitializer) crea la siguiente cuenta:
+## Imágenes de hoteles
 
-|Usuario|Contraseña|Rol|
-|-|-|-|
-|`admin@ntshotels.com`|`Admin123\*`|`Admin`|
+Los hoteles almacenan imágenes como bytes JPEG en SQLite, no como enlaces externos. El formulario acepta archivos JPEG, PNG y WebP de hasta 10 MB y 25 megapíxeles. La API utiliza **Magick.NET** para corregir la orientación, limitar el ancho a 800 píxeles y generar un JPEG con calidad 80. Al editar sin seleccionar un archivo nuevo, se conserva la imagen guardada. Si no hay imagen, el cliente muestra una imagen de respaldo.
 
-\---
+La creación y actualización con archivos usan `multipart/form-data`; los endpoints JSON siguen disponibles para guardar datos sin adjuntar archivos. Los bytes se recuperan mediante `GET /api/hotels/{id}/image`.
 
-## Resumen de Componentes y Funcionalidades
+Antes de actualizar una base existente, realiza un respaldo. La migración convierte los enlaces históricos a imágenes almacenadas antes de eliminar la columna anterior. Si una descarga o conversión falla, el arranque se detiene y se conservan los datos originales. La guía de la API describe las restricciones de la importación.
 
-### Backend (NtsHotels.Api)
+## Notificaciones y funcionalidades
 
-* Persistencia local mediante SQLite (`nts\_hotels.db`) con Entity Framework Core.
-* Autenticacion mediante JSON Web Tokens (JWT) y cifrado de contraseñas con BCrypt.
-* Inicialización automatica de datos (Seed) con 9 hoteles de prueba en Colombia y usuario administrador.
-* Proteccion de rutas por rol (`Admin`) para creacion, edicion y eliminacion de hoteles y gestion de usuarios.
-* Documentación interactiva con Swagger en entorno de desarrollo.
+- Catálogo público con búsqueda por nombre y filtro por estrellas.
+- Inicio de sesión con JWT, contraseñas almacenadas como hashes BCrypt y rutas administrativas protegidas.
+- Gestión de hoteles y usuarios desde `/admin` y `/admin/users`.
+- Notificaciones tipo toast de éxito o error para operaciones de creación, actualización y eliminación.
 
-### Frontend (nts-hotels-client)
+## API principal
 
-* Landing page publica con listado de hoteles en grid responsivo.
-* Buscador en tiempo real con debounce (300 ms) y filtro por calificacion (estrellas).
-* Panel de administracion protegido (`/admin`) con formularios reactivos para operacion CRUD de hoteles y usuarios.
-* Interceptor HTTP para inyeccion automatica de encabezado `Authorization: Bearer <token>` y manejo de expiracion de sesion (401).
-* Guards de navegacion (`adminGuard`) para restringir el acceso a usuarios no autorizados.
+| Método | Ruta | Acceso |
+| --- | --- | --- |
+| `POST` | `/api/auth/login` | Público |
+| `GET` | `/api/hotels`, `/api/hotels/{id}`, `/api/hotels/{id}/image` | Público |
+| `POST` | `/api/hotels`, `/api/hotels/upload` | Admin |
+| `PUT` | `/api/hotels/{id}`, `/api/hotels/{id}/upload` | Admin |
+| `DELETE` | `/api/hotels/{id}` | Admin |
+| `GET`, `POST` | `/api/users` | Admin |
+| `GET`, `PUT`, `DELETE` | `/api/users/{id}` | Admin |
 
-\---
+`DELETE` desactiva hoteles y usuarios en lugar de eliminarlos físicamente. Para el contrato completo, formatos de entrada y ejemplos, consulta la guía de la API.
 
-## Licencia y Uso
+## Validación
 
-Proyecto desarrollado como prueba tecnica de evaluacion para Cheil Connec+.
+```powershell
+cd NtsHotels.Api
+dotnet build
+cd ..\nts-hotels-client
+npm run build
+npm test -- --watch=false
+```
 
+Los contenedores requieren configuración específica de producción, incluyendo secretos, CORS, URL pública de la API y persistencia de SQLite.

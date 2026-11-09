@@ -67,6 +67,8 @@ public class UserService(ApplicationDbContext db) : IUserService
         user.Email = email;
         user.RoleId = dto.RoleId;
         user.IsActive = dto.IsActive;
+        if (!string.IsNullOrEmpty(dto.Password))
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
         await db.SaveChangesAsync();
         return true;

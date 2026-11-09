@@ -5,7 +5,7 @@ using NtsHotels.Api.Models;
 
 namespace NtsHotels.Api.Services;
 
-public class HotelService(ApplicationDbContext db) : IHotelService
+public class HotelService(ApplicationDbContext db, HotelImageProcessor images) : IHotelService
 {
     public async Task<IEnumerable<HotelResponseDto>> GetAllAsync(string? name, int? rating)
     {
@@ -17,8 +17,12 @@ public class HotelService(ApplicationDbContext db) : IHotelService
         if (rating.HasValue)
             query = query.Where(h => h.Rating == rating.Value);
 
-        var hotels = await query.OrderBy(h => h.Name).ToListAsync();
-        return hotels.Select(ToDto).ToList();
+        return await query.OrderBy(h => h.Name).Select(h => new HotelResponseDto
+        {
+            Id = h.Id, Name = h.Name, Description = h.Description, Address = h.Address,
+            City = h.City, Rating = h.Rating,
+            HasStoredImage = h.ImageData != null, IsActive = h.IsActive, CreatedAt = h.CreatedAt
+        }).ToListAsync();
     }
 
     public async Task<HotelResponseDto?> GetByIdAsync(Guid id)
@@ -27,7 +31,11 @@ public class HotelService(ApplicationDbContext db) : IHotelService
         return hotel is null ? null : ToDto(hotel);
     }
 
-    public async Task<HotelResponseDto> CreateAsync(HotelCreateDto dto)
+    public Task<byte[]?> GetImageAsync(Guid id) =>
+        db.Hotels.AsNoTracking().Where(h => h.Id == id && h.IsActive)
+            .Select(h => h.ImageData).FirstOrDefaultAsync();
+
+    public async Task<HotelResponseDto> CreateAsync(HotelCreateDto dto, IFormFile? image = null)
     {
         var hotel = new Hotel
         {
@@ -37,7 +45,7 @@ public class HotelService(ApplicationDbContext db) : IHotelService
             Address = dto.Address,
             City = dto.City,
             Rating = dto.Rating,
-            ImageUrl = dto.ImageUrl,
+            ImageData = image is null ? null : await images.CompressAsync(image),
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -47,7 +55,7 @@ public class HotelService(ApplicationDbContext db) : IHotelService
         return ToDto(hotel);
     }
 
-    public async Task<bool> UpdateAsync(Guid id, HotelUpdateDto dto)
+    public async Task<bool> UpdateAsync(Guid id, HotelUpdateDto dto, IFormFile? image = null)
     {
         var hotel = await db.Hotels.FindAsync(id);
         if (hotel is null) return false;
@@ -57,7 +65,8 @@ public class HotelService(ApplicationDbContext db) : IHotelService
         hotel.Address = dto.Address;
         hotel.City = dto.City;
         hotel.Rating = dto.Rating;
-        hotel.ImageUrl = dto.ImageUrl;
+        if (image is not null)
+            hotel.ImageData = await images.CompressAsync(image);
         hotel.IsActive = dto.IsActive;
 
         await db.SaveChangesAsync();
@@ -82,7 +91,7 @@ public class HotelService(ApplicationDbContext db) : IHotelService
         Address = h.Address,
         City = h.City,
         Rating = h.Rating,
-        ImageUrl = h.ImageUrl,
+        HasStoredImage = h.ImageData != null,
         IsActive = h.IsActive,
         CreatedAt = h.CreatedAt
     };

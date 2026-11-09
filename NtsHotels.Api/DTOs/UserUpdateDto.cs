@@ -13,5 +13,8 @@ public class UserUpdateDto
     [Range(1, int.MaxValue)]
     public int RoleId { get; set; }
 
+    [MinLength(6)]
+    public string? Password { get; set; }
+
     public bool IsActive { get; set; } = true;
 }
