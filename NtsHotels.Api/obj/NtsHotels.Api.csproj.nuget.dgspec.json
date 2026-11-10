@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\inetpub\\Proyectos\\NtsHotels.Api\\NtsHotels.Api.csproj": {}
+    "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\NtsHotels.Api.csproj": {}
   },
   "projects": {
-    "C:\\inetpub\\Proyectos\\NtsHotels.Api\\NtsHotels.Api.csproj": {
+    "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\NtsHotels.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\inetpub\\Proyectos\\NtsHotels.Api\\NtsHotels.Api.csproj",
+        "projectUniqueName": "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\NtsHotels.Api.csproj",
         "projectName": "NtsHotels.Api",
-        "projectPath": "C:\\inetpub\\Proyectos\\NtsHotels.Api\\NtsHotels.Api.csproj",
+        "projectPath": "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\NtsHotels.Api.csproj",
         "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
-        "outputPath": "C:\\inetpub\\Proyectos\\NtsHotels.Api\\obj\\",
+        "outputPath": "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -54,6 +54,10 @@
             "BCrypt.Net-Next": {
               "target": "Package",
               "version": "[4.2.0, )"
+            },
+            "Magick.NET-Q8-AnyCPU": {
+              "target": "Package",
+              "version": "[15.1.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

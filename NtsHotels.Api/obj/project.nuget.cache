@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "Ec7nWo/3enk=",
+  "dgSpecHash": "WQMr5imRgSg=",
   "success": true,
-  "projectFilePath": "C:\\inetpub\\Proyectos\\NtsHotels.Api\\NtsHotels.Api.csproj",
+  "projectFilePath": "C:\\inetpub\\Proyectos\\NtsHotels-Project\\NtsHotels.Api\\NtsHotels.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kevin\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
+    "C:\\Users\\Kevin\\.nuget\\packages\\magick.net-q8-anycpu\\15.1.0\\magick.net-q8-anycpu.15.1.0.nupkg.sha512",
+    "C:\\Users\\Kevin\\.nuget\\packages\\magick.net.core\\15.1.0\\magick.net.core.15.1.0.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.33\\microsoft.aspnetcore.authentication.jwtbearer.8.0.33.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.3\\microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",
@@ -65,10 +67,10 @@
     "C:\\Users\\Kevin\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512",
-    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.33\\microsoft.netcore.app.ref.8.0.33.nupkg.sha512",
-    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.33\\microsoft.windowsdesktop.app.ref.8.0.33.nupkg.sha512",
     "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.33\\microsoft.aspnetcore.app.ref.8.0.33.nupkg.sha512",
-    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.33\\microsoft.netcore.app.host.win-x64.8.0.33.nupkg.sha512"
+    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.33\\microsoft.netcore.app.host.win-x64.8.0.33.nupkg.sha512",
+    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.33\\microsoft.netcore.app.ref.8.0.33.nupkg.sha512",
+    "C:\\Users\\Kevin\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.33\\microsoft.windowsdesktop.app.ref.8.0.33.nupkg.sha512"
   ],
   "logs": []
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NtsHotels.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e53a2365b9273ea4022454a1f7771e45424fa4ba")]
 [assembly: System.Reflection.AssemblyProductAttribute("NtsHotels.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NtsHotels.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
