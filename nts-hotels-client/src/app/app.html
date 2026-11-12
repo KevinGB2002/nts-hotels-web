@@ -1,0 +1,9 @@
+﻿<router-outlet></router-outlet>
+<div class="notifications" aria-live="polite">
+  @for (notification of notifications.notifications(); track notification.id) {
+    <div class="toast" [class.toast-error]="notification.type === 'error'">
+      <span>{{ notification.message }}</span>
+      <button type="button" aria-label="Cerrar notificación" (click)="notifications.dismiss(notification.id)">×</button>
+    </div>
+  }
+</div>

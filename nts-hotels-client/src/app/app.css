@@ -1,0 +1,4 @@
+.notifications { position: fixed; top: 1rem; right: 1rem; z-index: 1100; display: grid; gap: .5rem; max-width: min(24rem, calc(100vw - 2rem)); }
+.toast { display: flex; align-items: center; gap: 1rem; justify-content: space-between; padding: .8rem 1rem; border-radius: .4rem; background: #176b3a; color: white; box-shadow: 0 3px 12px #0004; }
+.toast-error { background: #a52c20; }
+.toast button { border: 0; background: transparent; color: inherit; font-size: 1.3rem; cursor: pointer; }

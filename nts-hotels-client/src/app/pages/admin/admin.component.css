@@ -1,0 +1,24 @@
+:host { display: block; max-width: 1200px; margin: 0 auto; padding: 1rem; font-family: system-ui, sans-serif; }
+.top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.top-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.table-wrap { overflow-x: auto; margin-top: 1rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: .6rem; border-bottom: 1px solid #e3e3e3; text-align: left; }
+th { background: #f5f7fa; }
+.empty { text-align: center; color: #666; }
+.row-actions { white-space: nowrap; }
+.btn { display: inline-block; padding: .4rem .8rem; border: 1px solid #ccc; border-radius: 6px; background: #fff; color: #222; cursor: pointer; text-decoration: none; font: inherit; }
+.primary { background: #1565c0; color: #fff; border-color: #1565c0; }
+.danger { color: #c0392b; border-color: #c0392b; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.error { color: #c0392b; }
+.spinner { display: inline-block; width: 1.1rem; height: 1.1rem; border: 3px solid #ccc; border-top-color: #1565c0; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: middle; margin-right: .4rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.backdrop { position: fixed; inset: 0; background: #0006; display: grid; place-items: center; padding: 1rem; }
+.modal { background: #fff; border-radius: 10px; padding: 1.25rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: .6rem; }
+.modal h2 { margin: 0; }
+label { display: flex; flex-direction: column; gap: .2rem; font-size: .9rem; }
+label.check { flex-direction: row; align-items: center; gap: .5rem; }
+input:not([type=checkbox]), textarea { padding: .5rem; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+.err { color: #c0392b; }
+.actions { display: flex; justify-content: flex-end; gap: .5rem; }

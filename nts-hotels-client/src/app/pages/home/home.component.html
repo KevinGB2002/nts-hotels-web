@@ -1,0 +1,59 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand"><span class="logo">&#9733;</span> NTS Hotels</a>
+  <div class="links">
+    <a href="#hoteles" class="nav-link">Hoteles</a>
+    @if (auth.isLoggedIn()) {
+      @if (auth.isAdmin()) { <a routerLink="/admin" class="nav-link">Panel admin</a> }
+      <button type="button" class="nav-link" (click)="auth.logout()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login" class="nav-link">Acceso administradores</a>
+    }
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Bienvenido a NTS Hotels</h1>
+  <p>
+    Una cadena de hoteles pensada para que cada estadía sea memorable. Explora nuestras sedes,
+    compara calificaciones y encuentra el lugar ideal para tu próximo viaje.
+  </p>
+</section>
+
+<main class="content" id="hoteles">
+  <section class="filters" aria-label="Filtros">
+    <input
+      type="search"
+      placeholder="Buscar hotel por nombre..."
+      [(ngModel)]="name"
+      (ngModelChange)="onFilterChange()"
+    />
+    <select [(ngModel)]="rating" (ngModelChange)="onFilterChange()" aria-label="Calificación">
+      <option [ngValue]="undefined">Todas las calificaciones</option>
+      @for (r of ratings; track r) {
+        <option [ngValue]="r">{{ stars(r) }} ({{ r }})</option>
+      }
+    </select>
+  </section>
+
+  @if (loading()) {
+    <p class="msg"><span class="spinner"></span> Cargando hoteles...</p>
+  } @else if (error()) {
+    <p class="msg error">{{ error() }}</p>
+  } @else if (hotels().length === 0) {
+    <p class="msg">No se encontraron hoteles con los filtros seleccionados.</p>
+  } @else {
+    <section class="grid">
+      @for (h of hotels(); track h.id) {
+        <article class="card">
+          <img [src]="service.imageSource(h) || fallbackImage" [alt]="h.name" loading="lazy" (error)="onImageError($event)" />
+          <div class="body">
+            <h2>{{ h.name }}</h2>
+            <p class="stars" [attr.aria-label]="h.rating + ' de 5 estrellas'">{{ stars(h.rating) }}</p>
+            <p class="location">{{ h.city }} · {{ h.address }}</p>
+            <p class="desc">{{ h.description }}</p>
+          </div>
+        </article>
+      }
+    </section>
+  }
+</main>

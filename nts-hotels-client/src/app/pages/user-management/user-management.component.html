@@ -1,0 +1,88 @@
+<header class="top">
+  <h1>Gestión de usuarios</h1>
+  <div class="top-actions">
+    <a routerLink="/admin" class="btn">← Hoteles</a>
+    <button type="button" class="btn primary" (click)="openCreate()">Nuevo usuario</button>
+    <button type="button" class="btn" (click)="auth.logout()">Cerrar sesión</button>
+  </div>
+</header>
+
+@if (error() && !modalOpen()) {
+  <p class="err" role="alert">{{ error() }}</p>
+}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Creado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr><td colspan="6" class="empty">Cargando usuarios...</td></tr>
+      } @else {
+        @for (u of users(); track u.id) {
+          <tr>
+            <td>{{ u.fullName }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.roleName }}</td>
+            <td>{{ u.isActive ? 'Activo' : 'Inactivo' }}</td>
+            <td>{{ u.createdAt | date: 'dd/MM/yyyy' }}</td>
+            <td class="row-actions">
+              <button type="button" class="btn" (click)="openEdit(u)">Editar</button>
+              <button type="button" class="btn" (click)="toggleActive(u)">
+                {{ u.isActive ? 'Desactivar' : 'Activar' }}
+              </button>
+              <button type="button" class="btn danger" (click)="remove(u)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty">No hay usuarios registrados.</td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (modalOpen()) {
+  <div class="backdrop" (click)="close()">
+    <form class="modal" [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" novalidate>
+      <h2>{{ editing() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+      @if (error()) { <p class="err" role="alert">{{ error() }}</p> }
+
+      <label>Nombre completo
+        <input formControlName="fullName" />
+        @if (invalid('fullName')) { <small class="err">El nombre es obligatorio.</small> }
+      </label>
+      <label>Correo
+        <input type="email" formControlName="email" />
+        @if (invalid('email')) { <small class="err">Ingresa un correo válido.</small> }
+      </label>
+      <label>Contraseña {{ editing() ? '(dejar vacío para no cambiar)' : '' }}
+        <input type="password" formControlName="password" autocomplete="new-password" />
+        @if (invalid('password')) {
+          <small class="err">Mínimo 6 caracteres, con al menos una mayúscula y un número.</small>
+        }
+      </label>
+      <label>Rol
+        <select formControlName="roleId">
+          @for (r of roles; track r.id) { <option [ngValue]="r.id">{{ r.name }}</option> }
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" formControlName="isActive" /> Activo</label>
+
+      <div class="actions">
+        <button type="button" class="btn" (click)="close()">Cancelar</button>
+        <button type="submit" class="btn primary" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

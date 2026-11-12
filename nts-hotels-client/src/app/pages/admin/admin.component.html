@@ -1,0 +1,91 @@
+<header class="top">
+  <h1>Panel de administración</h1>
+  <div class="top-actions">
+    <a routerLink="/" class="btn">← Volver a la Landing Page</a>
+    <a routerLink="/admin/users" class="btn">Usuarios</a>
+    <button type="button" class="btn" (click)="auth.logout()">Cerrar sesión</button>
+    <button type="button" class="btn primary" (click)="openCreate()">Nuevo hotel</button>
+  </div>
+</header>
+
+@if (error() && !modalOpen()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Ciudad</th>
+        <th>Dirección</th>
+        <th>Calificación</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr><td colspan="6" class="empty"><span class="spinner"></span> Cargando hoteles...</td></tr>
+      } @else {
+        @for (h of hotels(); track h.id) {
+          <tr>
+            <td>{{ h.name }}</td>
+            <td>{{ h.city }}</td>
+            <td>{{ h.address }}</td>
+            <td>{{ h.rating }} ★</td>
+            <td>{{ h.isActive ? 'Activo' : 'Inactivo' }}</td>
+            <td class="row-actions">
+              <button type="button" class="btn" (click)="openEdit(h)">Editar</button>
+              <button type="button" class="btn danger" (click)="remove(h)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty">No hay hoteles registrados.</td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (modalOpen()) {
+  <div class="backdrop" (click)="close()">
+    <form class="modal" [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" novalidate>
+      <h2>{{ editingId() ? 'Editar hotel' : 'Nuevo hotel' }}</h2>
+      @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+
+      <label>Nombre
+        <input formControlName="name" />
+        @if (invalid('name')) { <small class="err">El nombre es obligatorio.</small> }
+      </label>
+      <label>Descripción
+        <textarea rows="3" formControlName="description"></textarea>
+        @if (invalid('description')) { <small class="err">La descripción es obligatoria.</small> }
+      </label>
+      <label>Dirección
+        <input formControlName="address" />
+        @if (invalid('address')) { <small class="err">La dirección es obligatoria.</small> }
+      </label>
+      <label>Ciudad
+        <input formControlName="city" />
+        @if (invalid('city')) { <small class="err">La ciudad es obligatoria.</small> }
+      </label>
+      <label>Calificación (1-5)
+        <input type="number" min="1" max="5" formControlName="rating" />
+        @if (invalid('rating')) { <small class="err">Ingresa una calificación entre 1 y 5.</small> }
+      </label>
+      <label>Archivo de imagen (JPEG, PNG o WebP; máximo 10 MB)
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectImage($event)" />
+        <small>Al editar, deja el archivo vacío para mantener la imagen actual.</small>
+      </label>
+      <label class="check"><input type="checkbox" formControlName="isActive" /> Activo</label>
+
+      <div class="actions">
+        <button type="button" class="btn" (click)="close()">Cancelar</button>
+        <button type="submit" class="btn primary" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
